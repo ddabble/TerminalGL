@@ -78,13 +78,13 @@ public class Main {
 		screen[0][0] = '╚';
 		screen[0][width - 1] = '╝';
 
-		// Upper and lower border
+		// Upper and lower borders
 		for (int col = 1; col < width - 1; col++) {
 			screen[height - 1][col] = '═';
 			screen[0][col] = '═';
 		}
 
-		// Left and right border
+		// Left and right borders
 		for (int row = 1; row < height - 1; row++) {
 			screen[row][0] = '║';
 			screen[row][width - 1] = '║';
@@ -130,10 +130,8 @@ public class Main {
 	}
 
 	private static void drawLine(int startX, int startY, int endX, int endY) {
-		float deltaX = endX - startX;
-		float deltaY = endY - startY;
 
-		if (deltaX < 0 || (deltaX < 0 && deltaY < 0)) {
+		if (endX - startX < 0) {
 			// Swap startX and endX
 			startX = startX ^ endX;
 			endX = startX ^ endX;
@@ -144,18 +142,21 @@ public class Main {
 			startY = startY ^ endY;
 		}
 
+		float deltaX = endX - startX;
+		float deltaY = endY - startY;
+		int signumY = Math.signum(deltaY);
 		float error = 0;
 		float deltaError = (deltaX == 0) ? Math.abs(deltaY) + 1 : Math.abs(deltaY / deltaX);
 		int y = startY;
 
-		// Find and fill all pixels between the two points
+		// Finds and fills all pixels between the two points
 		for (int x = startX; x <= endX; x++) {
 			putPixel(x, y);
 			error += deltaError;
 
-			while (error >= 0.5) {
+			while (error >= 0.5 && signumY * y < signumY * endY) {
 				putPixel(x, y);
-				y += Math.signum(endY - startY);
+				y += signumY;
 				error -= 1;
 			}
 		}
