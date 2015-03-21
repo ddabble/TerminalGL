@@ -48,7 +48,6 @@ public class Main {
 		}
 
 		setup();
-		scanner.nextLine();
 	}
 
 	private static void setup() {
@@ -62,38 +61,39 @@ public class Main {
 
 			System.out.println("Please input '1' if you're running Windows or '2' if you're running Linux.");
 			isLinux = scanner.nextInt() == 2;
-			writer.write("isLinux: " + isLinux);
-			writer.newLine();
 
 			System.out.println("\nPlease SPAM YOUR KEYBOARD as calmly as possible until your rambling covers the entire length of your terminal, or simply write the length if you already know it."
 					+ "\nWhen you're finished with either; press enter.");
 			String length = scanner.next();
+			System.out.println();
 
-			if (length.length() < 5 && Integer.parseInt(length) > 42)
+			if (length.length() <= 4 && Integer.parseInt(length) > 42)
 				width = Integer.parseInt(length);
 			else
 				width = length.length();
 
-			writer.write("width: " + width);
-			writer.newLine();
 			xMax = width - 3;
 
-			System.out.println("\nThe width of your terminal window is: " + width + ". Press enter.\n");
-			scanner.nextLine();
-
-			for (int i = 0; i <= 123; i++)
+			for (int i = 0; i <= 256; i++)
 				System.out.println(i);
 
 			System.out.println("\nNow, please write the number that's shown on the top line of your terminal window and press enter.");
-			height = 126 - scanner.nextInt();
-			writer.write("height: " + height);
-			writer.newLine();
+			height = 259 - scanner.nextInt();
 			yMax = height - 3;
 
 			System.out.println("\nSetup is now finished and the main screen will be shown."
 					+ "\nFrom now on, press enter to show the next frame (keep it pressed to enter Superfast Mode™) or enter 'q' to quit."
 					+ "\nPlease press enter one last time.");
 			scanner.nextLine();
+			// I have no idea why this is (seemingly) necessary
+			scanner.nextLine();
+
+			writer.write("isLinux: " + isLinux);
+			writer.newLine();
+			writer.write("width: " + width);
+			writer.newLine();
+			writer.write("height: " + height);
+			writer.newLine();
 		} catch (IOException e) {
 			System.out.println("Unable to write to file: " + setup.toString());
 			e.printStackTrace();
@@ -178,12 +178,11 @@ public class Main {
 	private static float angle = 0;
 
 	private static StringBuffer makeScreen() {
-		drawSquare(10, 5, 10);
-		drawRotatingSquare(70, 11, 20, 5);
-		drawQuadrilateral(15, 20, 22, 23, 40, 19, 20, 30);
-		drawCircle(170, 40, 22);
+		drawRectangle(100, 20, 6, 7, angle);
 		drawLine(80, 60, 5, angle);
-		angle += 5;
+		angle += 15;
+		drawPolygon(15, 15, 22, 21, 33, 17, 20, 30);
+		drawCircle(170, 40, 22);
 
 		StringBuffer screenBuffer = new StringBuffer();
 
@@ -217,32 +216,32 @@ public class Main {
 		}
 	}
 
-	public static void drawLine(int startX, int startY, int endX, int endY) {
+	public static void drawLine(int x0, int y0, int x1, int y1) {
 
-		if (endX - startX < 0) {
+		if (x1 - x0 < 0) {
 			// Swap startX and endX
-			startX = startX ^ endX;
-			endX = startX ^ endX;
-			startX = startX ^ endX;
+			x0 = x0 ^ x1;
+			x1 = x0 ^ x1;
+			x0 = x0 ^ x1;
 			// Swap startY and endY
-			startY = startY ^ endY;
-			endY = startY ^ endY;
-			startY = startY ^ endY;
+			y0 = y0 ^ y1;
+			y1 = y0 ^ y1;
+			y0 = y0 ^ y1;
 		}
 
-		float deltaX = endX - startX;
-		float deltaY = endY - startY;
+		float deltaX = x1 - x0;
+		float deltaY = y1 - y0;
 		float signumY = Math.signum(deltaY);
 		float error = 0;
 		float deltaError = (deltaX == 0) ? Math.abs(deltaY) + 1 : Math.abs(deltaY / deltaX);
-		int y = startY;
+		int y = y0;
 
 		// Finds and fills all pixels between the two points
-		for (int x = startX; x <= endX; x++) {
+		for (int x = x0; x <= x1; x++) {
 			putPixel(x, y);
 			error += deltaError;
 
-			while (error >= 0.5 && signumY * y <= signumY * endY) {
+			while (error >= 0.5 && signumY * y <= signumY * y1) {
 				putPixel(x, y);
 				y += signumY;
 				error--;
@@ -250,13 +249,13 @@ public class Main {
 		}
 	}
 
-	public static void drawLine(int x, int y, int length, float angle) {
+	public static void drawLine(int x, int y, int length, double angle) {
 		boolean even = length % 2 == 0;
 
 		if (even)
 			length++;
 
-		angle = (float) Math.toRadians(angle);
+		angle = Math.toRadians(angle);
 		int extendedX = (int) (Math.cos(angle) * (length / 2f));
 		int extendedY = (int) (Math.sin(angle) * (length / 2f));
 		int x0 = x - (extendedX - ((even) ? (int) Math.signum(extendedX) : 0));
@@ -266,55 +265,70 @@ public class Main {
 		drawLine(x0, y0, x1, y1);
 	}
 
-	public static void drawSquare(int bottomLeftX, int bottomLeftY, int size) {
-		size--;
-		// Bottom left point (starting point)
-		int x0 = bottomLeftX;
-		int y0 = bottomLeftY;
-		// Bottom right point
-		int x1 = x0 + size * 2 + 1;
-		int y1 = y0;
-		// Top right point
-		int x2 = x1;
-		int y2 = y1 + size;
-		// Top left point
-		int x3 = x2 - size * 2 - 1;
-		int y3 = y2;
+	public static void drawRectangle(int x, int y, int width, int height, double angle) {
+		
+		// Temporary fix while I figure out how to solve it
+		if (width % 2 == 0 || height % 2 == 0) {
+			displayMessage("ERROR: Tried to draw a rectangle with either an even width or an even height. Sorry about that.");
+			return;
+		}
+		
+//		boolean evenWidth = width % 2 == 0;
+//		boolean evenHeight = height % 2 == 0;
 
+		double hypotenuse = Math.hypot(width, height);
+		
+		angle = Math.toRadians(angle) + Math.asin(height / hypotenuse);
+		int extendedX = (int) (Math.cos(angle) * (hypotenuse / 2));
+		int extendedY = (int) (Math.sin(angle) * (hypotenuse / 2));
+		int x0 = x - extendedX;
+		int y0 = y - extendedY;
+		int x2 = x + extendedX;
+		int y2 = y + extendedY;
+		
+		angle += Math.PI / 2;
+		extendedX = (int) (Math.cos(angle) * (hypotenuse / 2));
+		extendedY = (int) (Math.sin(angle) * (hypotenuse / 2));
+		int x1 = x - extendedX;
+		int y1 = y - extendedY;
+		int x3 = x + extendedX;
+		int y3 = y + extendedY;
+		
 		drawLine(x0, y0, x1, y1);
 		drawLine(x1, y1, x2, y2);
 		drawLine(x2, y2, x3, y3);
 		drawLine(x3, y3, x0, y0);
+		
+//		putPixel(x0, y0);
+//		putPixel(x1, y1);
+//		putPixel(x2, y2);
+//		putPixel(x3, y3);
+
+//		putPixel(x, y);
 	}
 
-	public static void drawRotatingSquare(int bottomLeftX, int bottomLeftY, int size, float rotationSpeed) {
-		// Does not actually rotate.. yet..
+	public static void drawPolygon(int... cornerCoordinates) {
 
-		size--;
-		// Bottom left point (starting point)
-		int x0 = bottomLeftX;
-		int y0 = bottomLeftY;
-		// Bottom right point
-		int x1 = x0 + size * 2 + 1;
-		int y1 = y0;
-		// Top right point
-		int x2 = x1;
-		int y2 = y1 + size;
-		// Top left point
-		int x3 = x2 - size * 2 - 1;
-		int y3 = y2;
+		if (cornerCoordinates.length < 6) {
+			displayMessage("Tried to draw a polygon with less than 3 x- and y-coordinate pairs.");
+			return;
+		}
 
-		drawLine(x0, y0, x1, y1);
-		drawLine(x1, y1, x2, y2);
-		drawLine(x2, y2, x3, y3);
-		drawLine(x3, y3, x0, y0);
-	}
+		if (cornerCoordinates.length % 2 != 0) {
+			displayMessage("Tried to draw a polygon without a matching number of x- and y-coordinates.");
+			return;
+		}
 
-	public static void drawQuadrilateral(int x0, int y0, int x1, int y1, int x2, int y2, int x3, int y3) {
-		drawLine(x0, y0, x1, y1);
-		drawLine(x1, y1, x2, y2);
-		drawLine(x2, y2, x3, y3);
-		drawLine(x3, y3, x0, y0);
+		for (int i = 0; i < cornerCoordinates.length; i += 2) {
+
+			if (i == cornerCoordinates.length - 2) {
+				int x0 = cornerCoordinates[0], y0 = cornerCoordinates[1], x1 = cornerCoordinates[i], y1 = cornerCoordinates[i + 1];
+				drawLine(x1, y1, x0, y0);
+			} else {
+				int x0 = cornerCoordinates[i], y0 = cornerCoordinates[i + 1], x1 = cornerCoordinates[i + 2], y1 = cornerCoordinates[i + 3];
+				drawLine(x0, y0, x1, y1);
+			}
+		}
 	}
 
 	public static void drawCircle(int x0, int y0, int radius) {
