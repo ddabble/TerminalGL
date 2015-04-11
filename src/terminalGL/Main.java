@@ -74,7 +74,7 @@ public class Main {
 
 			xMax = width - 3;
 
-			for (int i = 0; i <= 256; i++)
+			for (int i = 0; i <= 256; ++i)
 				System.out.println(i);
 
 			System.out.println("\nNow, please write the number that's shown on the top line of your terminal window and press enter.");
@@ -151,13 +151,13 @@ public class Main {
 		screen[0][width - 1] = '╝';
 
 		// Upper and lower borders
-		for (int col = 1; col < width - 1; col++) {
+		for (int col = 1; col < width - 1; ++col) {
 			screen[height - 1][col] = '═';
 			screen[0][col] = '═';
 		}
 
 		// Left and right borders
-		for (int row = 1; row < height - 1; row++) {
+		for (int row = 1; row < height - 1; ++row) {
 			screen[row][0] = '║';
 			screen[row][width - 1] = '║';
 		}
@@ -167,9 +167,9 @@ public class Main {
 
 	private static void flushScreen() {
 		// Fills the screen with spaces
-		for (int row = 1; row < height - 1; row++) {
+		for (int row = 1; row < height - 1; ++row) {
 
-			for (int col = 1; col < width - 1; col++) {
+			for (int col = 1; col < width - 1; ++col) {
 				screen[row][col] = ' ';
 			}
 		}
@@ -178,7 +178,7 @@ public class Main {
 	private static float angle = 0;
 
 	private static StringBuffer makeScreen() {
-		drawRectangle(100, 20, 6, 7, angle);
+		drawRectangle(100, 20, 16, 16, angle);
 		drawLine(80, 60, 5, angle);
 		angle += 15;
 		drawPolygon(15, 15, 22, 21, 33, 17, 20, 30);
@@ -186,9 +186,9 @@ public class Main {
 
 		StringBuffer screenBuffer = new StringBuffer();
 
-		for (int row = height - 1; row >= 0; row--) {
+		for (int row = height - 1; row >= 0; --row) {
 
-			for (int col = 0; col < width; col++) {
+			for (int col = 0; col < width; ++col) {
 				screenBuffer.append(screen[row][col]);
 			}
 
@@ -219,11 +219,11 @@ public class Main {
 	public static void drawLine(int x0, int y0, int x1, int y1) {
 
 		if (x1 - x0 < 0) {
-			// Swap startX and endX
+			// Swap x0 and x1
 			x0 = x0 ^ x1;
 			x1 = x0 ^ x1;
 			x0 = x0 ^ x1;
-			// Swap startY and endY
+			// Swap y0 and y1
 			y0 = y0 ^ y1;
 			y1 = y0 ^ y1;
 			y0 = y0 ^ y1;
@@ -237,14 +237,14 @@ public class Main {
 		int y = y0;
 
 		// Finds and fills all pixels between the two points
-		for (int x = x0; x <= x1; x++) {
+		for (int x = x0; x <= x1; ++x) {
 			putPixel(x, y);
 			error += deltaError;
 
 			while (error >= 0.5 && signumY * y <= signumY * y1) {
 				putPixel(x, y);
 				y += signumY;
-				error--;
+				--error;
 			}
 		}
 	}
@@ -253,7 +253,7 @@ public class Main {
 		boolean even = length % 2 == 0;
 
 		if (even)
-			length++;
+			++length;
 
 		angle = Math.toRadians(angle);
 		int extendedX = (int) (Math.cos(angle) * (length / 2f));
@@ -266,18 +266,8 @@ public class Main {
 	}
 
 	public static void drawRectangle(int x, int y, int width, int height, double angle) {
-		
-		// Temporary fix while I figure out how to solve it
-		if (width % 2 == 0 || height % 2 == 0) {
-			displayMessage("ERROR: Tried to draw a rectangle with either an even width or an even height. Sorry about that.");
-			return;
-		}
-		
-//		boolean evenWidth = width % 2 == 0;
-//		boolean evenHeight = height % 2 == 0;
-
 		double hypotenuse = Math.hypot(width, height);
-		
+
 		angle = Math.toRadians(angle) + Math.asin(height / hypotenuse);
 		int extendedX = (int) (Math.cos(angle) * (hypotenuse / 2));
 		int extendedY = (int) (Math.sin(angle) * (hypotenuse / 2));
@@ -285,7 +275,7 @@ public class Main {
 		int y0 = y - extendedY;
 		int x2 = x + extendedX;
 		int y2 = y + extendedY;
-		
+
 		angle += Math.PI / 2;
 		extendedX = (int) (Math.cos(angle) * (hypotenuse / 2));
 		extendedY = (int) (Math.sin(angle) * (hypotenuse / 2));
@@ -293,18 +283,11 @@ public class Main {
 		int y1 = y - extendedY;
 		int x3 = x + extendedX;
 		int y3 = y + extendedY;
-		
+
 		drawLine(x0, y0, x1, y1);
 		drawLine(x1, y1, x2, y2);
 		drawLine(x2, y2, x3, y3);
 		drawLine(x3, y3, x0, y0);
-		
-//		putPixel(x0, y0);
-//		putPixel(x1, y1);
-//		putPixel(x2, y2);
-//		putPixel(x3, y3);
-
-//		putPixel(x, y);
 	}
 
 	public static void drawPolygon(int... cornerCoordinates) {
@@ -345,12 +328,12 @@ public class Main {
 			putPixel(-y + x0, -x + y0);
 			putPixel(x + x0, -y + y0);
 			putPixel(y + x0, -x + y0);
-			y++;
+			++y;
 
 			if (radiusError < 0) {
 				radiusError += 2 * y + 1;
 			} else {
-				x--;
+				--x;
 				radiusError += 2 * (y - x) + 1;
 			}
 		}
@@ -358,8 +341,9 @@ public class Main {
 
 	public static void displayMessage(String message) {
 		// TODO Support for multiple and multi-line messages, and messages expiring after a certain amount of time
+		// TODO Fix stack overflow happening in case of trying to display a message in out of bounds screen areas
 
-		for (int i = 0; i < message.length(); i++)
+		for (int i = 0; i < message.length(); ++i)
 			putPixel(i, 0, message.charAt(i));
 	}
 }
