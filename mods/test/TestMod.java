@@ -14,7 +14,7 @@ public class TestMod {
 	}
 
 	public static void main() {
-		TerminalGL.displayMessage("Line and rectangle angle: " + angle, EnumMessageType.ERROR);
+		TerminalGL.displayMessage("Line and rectangle angle: " + angle, EnumMessageType.INFO);
 		Drawing.drawLine(80, 60, 5, angle);
 		Drawing.drawRectangle(100, 20, 16, 16, angle);
 		Drawing.drawPolygon(15, 15, 22, 21, 33, 17, 20, 30);

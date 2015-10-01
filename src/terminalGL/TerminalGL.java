@@ -71,7 +71,7 @@ public class TerminalGL {
 			modDirectory = new File(path + "mods");
 
 		System.out.println("\nPlease place your mod jar files in " + modDirectory.getAbsolutePath() + "\\");
-		System.out.println("You can modify this location in the property file.");
+		System.out.println("You can modify this location in the property file.\n");
 	}
 
 	private static String getModPath() throws Exception {
@@ -111,6 +111,8 @@ public class TerminalGL {
 				findMods(path + "/" + file.getName());
 			else if (file.getName().endsWith(".jar"))
 				registerModInJar(file);
+			else if (file.getName().endsWith(".class"))
+				registerModFromClass(file);
 		}
 	}
 
@@ -127,12 +129,12 @@ public class TerminalGL {
 			JarEntry entry = jarEntries.nextElement();
 
 			if (entry.getName().endsWith(".class")) {
-				String className = entry.getName().substring(0, entry.getName().length() - 6).replace('/', '.');
+				String classPath = entry.getName().substring(0, entry.getName().length() - 6).replace('/', '.');
 				Class<?> clazz = null;
 
 				try {
 					classLoader = new URLClassLoader(new URL[] { jarFile.toURI().toURL() });
-					clazz = classLoader.loadClass(className);
+					clazz = classLoader.loadClass(classPath);
 				} catch (Exception e) {
 					System.err.println("Could not register the mod inside " + jarFile.getName());
 					e.printStackTrace();
@@ -142,10 +144,41 @@ public class TerminalGL {
 				if (clazz.isAnnotationPresent(ModMarker.class)) {
 					Mod mod = new Mod(clazz);
 					mods.add(mod);
-					System.out.print("\nLoaded " + mod.name + mod.version);
+					System.out.println("Loaded " + mod.name + mod.version);
 					return;
 				}
 			}
+		}
+	}
+
+	private static void registerModFromClass(File file) {
+		String filePath = file.getAbsolutePath();
+		String fileName = file.getName();
+
+		String packageName = filePath.substring(modDirectory.getAbsolutePath().length() + 1, filePath.length() - (fileName.length() + 1)).replace('\\', '.');
+		String className = fileName.substring(0, fileName.length() - 6);
+		Class<?> clazz = null;
+
+		try {
+			classLoader = new URLClassLoader(new URL[] { modDirectory.toURI().toURL() });
+			clazz = classLoader.loadClass(packageName + "." + className);
+		} catch (Exception e) {
+			System.err.println("Could not load the class " + className + " inside package " + packageName);
+			e.printStackTrace();
+			return;
+		} catch (Throwable e) {
+			System.err.println("Could not load the class " + className + " inside package " + packageName);
+			System.err.println("This is probably caused by the class being in the wrong package relative to your mods folder.");
+			System.err.println("Try moving the class' top package to " + modDirectory.getAbsolutePath() + " or give " + className + " the package name " + packageName);
+			e.printStackTrace();
+			return;
+		}
+
+		if (clazz.isAnnotationPresent(ModMarker.class)) {
+			Mod mod = new Mod(clazz);
+			mods.add(mod);
+			System.out.println("Loaded " + mod.name + mod.version);
+			return;
 		}
 	}
 
@@ -155,7 +188,7 @@ public class TerminalGL {
 			System.out.println();
 
 		if (propertyFile.exists()) {
-			System.out.println("\nDo you want to load the previous screen settings? If so, press enter. Otherwise, write something and then press enter.");
+			System.out.println("Do you want to load the previous screen settings? If so, press enter. Otherwise, type something and then press enter.");
 
 			if (scanner.nextLine().isEmpty()) {
 				setupFromFile();
@@ -175,7 +208,7 @@ public class TerminalGL {
 			System.out.println("Please maximise your terminal window and press enter.");
 			scanner.nextLine();
 
-			System.out.println("\nPlease SPAM YOUR KEYBOARD as calmly as possible until your rambling covers the entire length of your terminal, or simply write the length if you already know it.");
+			System.out.println("\nPlease SPAM YOUR KEYBOARD as calmly as possible until your rambling covers the entire length of your terminal, or simply type the length if you already know it.");
 			System.out.println("\nWhen you're finished with either; press enter.");
 			String length = scanner.next();
 			System.out.println();
@@ -190,7 +223,7 @@ public class TerminalGL {
 			for (int i = 0; i <= 256; ++i)
 				System.out.println(i);
 
-			System.out.println("\nNow, please write the number that's shown on the top line of your terminal window and press enter.");
+			System.out.println("\nNow, please type the number that's shown on the top line of your terminal window and press enter.");
 			height = 259 - scanner.nextInt();
 			yMax = height - 3;
 
