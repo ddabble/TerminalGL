@@ -5,7 +5,7 @@ An experiment with making a graphics library from scratch using characters in a 
 * Download **TerminalGL.jar** from this repository's root directory and place it somewhere warm and dry.
 * Put all your jarred mods in a folder named *mods* located in the same directory as the above-mentioned jar file.
 	* If you want to put them elsewhere, create a text file named *properties.txt*, again, in the same directory, and write a line starting with `mod-directory:` followed by the path to the desired folder.
-* Run the program from a command prompt with the command `java -jar "<path>"`, where <path> is replaced with the full path to the **TerminalGL.jar**-file.
+* Run the program from a command prompt with the command `java -jar "<path>"`, where &lt;path&gt; is replaced with the full path to the **TerminalGL.jar** file.
 
 ### Modding
 * Include **TerminalGL.jar** in your project's referenced libraries.
