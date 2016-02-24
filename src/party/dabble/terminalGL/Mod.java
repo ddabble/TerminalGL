@@ -1,4 +1,4 @@
-package party.dabble.terminalGL;
+package party.dabble.terminalgl;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
