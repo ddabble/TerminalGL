@@ -1,4 +1,4 @@
-package terminalGL;
+package party.dabble.terminalGL;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,7 +16,7 @@ import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import terminalGL.Mod.EnumMethod;
+import party.dabble.terminalGL.Mod.EnumMethod;
 
 public class TerminalGL {
 	private static boolean keepRunning = true;

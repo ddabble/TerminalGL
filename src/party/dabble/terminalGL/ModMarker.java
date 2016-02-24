@@ -1,4 +1,4 @@
-package terminalGL;
+package party.dabble.terminalGL;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
