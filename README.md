@@ -12,7 +12,7 @@ An experiment with making a graphics library from scratch using characters in a 
 * Create a main class and name it whatever you'd like. This will be your mod's starting point. Give it the annotation `@ModMarker`, which takes two elements:
 	* `name` - The full name of the mod.
 	* `version` - The version number of the mod. *(optional)*
-* Also, give your main class these three methods:
+* Also, give your main class these four methods:
 	* `public static void main(TerminalGL)` - Invoked just before each frame is drawn.
 	* `public static void init(TerminalGL)` - Invoked during the program's start-up. *(optional)*
 	* `public static Object registerMessage(TerminalGL)` - Invoked before `main`. Use this to communicate with other mods between each frame. *(optional)*
