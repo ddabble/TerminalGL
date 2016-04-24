@@ -1,39 +1,44 @@
 package asdf;
 
-import terminalGL.ModMarker;
-import terminalGL.TerminalGL;
+import party.dabble.terminalgl.TerminalGL;
+import party.dabble.terminalgl.util.ModMarker;
 
 @ModMarker(name = "Mod of Asdf")
-public class AsdfMod {
+public class AsdfMod
+{
+	private static final char c = '*';
 
-	public static void preInit() {
+	private static int x0 = 110;
+	private static int y0 = 24;
 
+	public static void main(TerminalGL terminalGL)
+	{
+		drawCircle(x0++, y0++, 22, terminalGL);
 	}
 
-	public static void main() {
-		drawCircle(170, 40, 22);
-	}
-
-	public static void drawCircle(int x0, int y0, int radius) {
+	public static void drawCircle(int x0, int y0, int radius, TerminalGL terminalGL)
+	{
 		int x = radius;
 		int y = 0;
 		int radiusError = 1 - x;
 
-		while (x >= y) {
-			TerminalGL.putPixel(x + x0, y + y0);
-			TerminalGL.putPixel(y + x0, x + y0);
-			TerminalGL.putPixel(-x + x0, y + y0);
-			TerminalGL.putPixel(-y + x0, x + y0);
-			TerminalGL.putPixel(-x + x0, -y + y0);
-			TerminalGL.putPixel(-y + x0, -x + y0);
-			TerminalGL.putPixel(x + x0, -y + y0);
-			TerminalGL.putPixel(y + x0, -x + y0);
-			++y;
+		while (x >= y)
+		{
+			terminalGL.putWrappedPixel(x + x0, y + y0, c);
+			terminalGL.putWrappedPixel(y + x0, x + y0, c);
+			terminalGL.putWrappedPixel(-x + x0, y + y0, c);
+			terminalGL.putWrappedPixel(-y + x0, x + y0, c);
+			terminalGL.putWrappedPixel(-x + x0, -y + y0, c);
+			terminalGL.putWrappedPixel(-y + x0, -x + y0, c);
+			terminalGL.putWrappedPixel(x + x0, -y + y0, c);
+			terminalGL.putWrappedPixel(y + x0, -x + y0, c);
+			y++;
 
 			if (radiusError < 0)
 				radiusError += 2 * y + 1;
-			else {
-				--x;
+			else
+			{
+				x--;
 				radiusError += 2 * (y - x) + 1;
 			}
 		}
