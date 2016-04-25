@@ -18,13 +18,14 @@ public class TerminalGL
 
 	public void run()
 	{
-		boolean setup = FileSystem.init(this);
+		FileSystem.init();
+		boolean retrievedAllSettings = FileSystem.initSettings(this);
 		FileSystem.findMods();
 
-		if (setup)
-			FileSystem.setup(this);
-		else
+		if (retrievedAllSettings)
 			FileSystem.setupPrompt(this);
+		else
+			FileSystem.setup(this);
 
 		ModManager.initMods(this);
 		initScreen();

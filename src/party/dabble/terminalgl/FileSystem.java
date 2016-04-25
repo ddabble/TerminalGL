@@ -25,7 +25,7 @@ public class FileSystem
 	static File modDirectory;
 	private static URLClassLoader classLoader;
 
-	static boolean init(TerminalGL terminalGL)
+	static void init()
 	{
 		try
 		{
@@ -42,21 +42,23 @@ public class FileSystem
 		}
 
 		modDirectory = new File(path + "\\mods");
-
-		boolean setup = false;
 		settingFile = new File(path + "\\settings.txt");
+	}
+
+	static boolean initSettings(TerminalGL terminalGL)
+	{
 		if (settingFile.exists())
 		{
-			if (!parseSettings(terminalGL))
+			if (parseSettings(terminalGL))
+				return true;
+			else
 			{
 				OutputHandler.lnprint("Scheduling a re-setup.");
 				OutputHandler.ln();
-				setup = true;
 			}
-		} else
-			setup = true;
+		}
 
-		return setup;
+		return false;
 	}
 
 	private static boolean parseSettings(TerminalGL terminalGL)
@@ -80,35 +82,54 @@ public class FileSystem
 		}
 
 		ArrayList<String> missingSettings = new ArrayList<>();
+		ArrayList<String> missingSetupSettings = new ArrayList<>();
 
-		String modPath = getSettingValue(Settings.MOD_DIRECTORY, settingFileLines);
-		if (modPath != null)
-			modDirectory = new File(modPath);
-		else
+		try
+		{
+			File directory = new File(getSettingValue(Settings.MOD_DIRECTORY, settingFileLines));
+			if (directory.isDirectory())
+				modDirectory = directory;
+			else if (directory.mkdirs())
+				modDirectory = directory;
+			else
+				throw new NullPointerException();
+		} catch (NullPointerException e)
+		{
 			missingSettings.add("\"" + Settings.MOD_DIRECTORY + "\"");
+		}
 
-		String width = getSettingValue(Settings.WIDTH, settingFileLines);
-		if (width != null)
+		try
 		{
-			terminalGL.width = Integer.parseInt(width);
+			terminalGL.width = Integer.parseInt(getSettingValue(Settings.WIDTH, settingFileLines));
 			terminalGL.xMax = terminalGL.width - 3;
-		} else
-			missingSettings.add("\"" + Settings.WIDTH + "\"");
-
-		String height = getSettingValue(Settings.HEIGHT, settingFileLines);
-		if (height != null)
+		} catch (NumberFormatException e)
 		{
-			terminalGL.height = Integer.parseInt(height);
+			missingSetupSettings.add("\"" + Settings.WIDTH + "\"");
+		}
+
+		try
+		{
+			terminalGL.height = Integer.parseInt(getSettingValue(Settings.HEIGHT, settingFileLines));
 			terminalGL.yMax = terminalGL.height - 3;
-		} else
-			missingSettings.add("\"" + Settings.HEIGHT + "\"");
+		} catch (NumberFormatException e)
+		{
+			missingSetupSettings.add("\"" + Settings.HEIGHT + "\"");
+		}
+
+		missingSettings.addAll(missingSetupSettings);
 
 		if (!missingSettings.isEmpty())
 		{
-			OutputHandler.lnprint("Could not find the setting" + ((missingSettings.size() > 1) ? "s " : " ") + formatWordList(missingSettings) + " in the setting file.");
-			return false;
-		} else
-			return true;
+			boolean plural = missingSettings.size() > 1;
+			OutputHandler.lnprint("Could not find the setting" + (plural ? "s " : " ")
+					+ formatWordList(missingSettings) + " in the setting file, or "
+					+ (plural ? "their values were" : "its value was") + " malformed.");
+
+			if (!missingSetupSettings.isEmpty())
+				return false;
+		}
+
+		return true;
 	}
 
 	private static String getSettingValue(String setting, ArrayList<String> settingFileLines)
@@ -149,7 +170,6 @@ public class FileSystem
 	static void findMods()
 	{
 		ArrayList<Mod> modsFound = new ArrayList<>();
-
 		findMods(modDirectory.getAbsolutePath(), modsFound);
 
 		OutputHandler.lnprint((modsFound.isEmpty() ? "Please place your" : "Found") + " mods in " + modDirectory.getAbsolutePath());
@@ -161,12 +181,6 @@ public class FileSystem
 
 	private static void findMods(String path, ArrayList<Mod> modsFound)
 	{
-		if (!modDirectory.exists())
-		{
-			modDirectory.mkdirs();
-			return;
-		}
-
 		for (File file : new File(path).listFiles())
 		{
 			if (file.isDirectory())
