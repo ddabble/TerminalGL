@@ -10,11 +10,11 @@ An experiment with making a graphics library from scratch using characters in a 
 ### Modding
 * Include **TerminalGL.jar** in your project's referenced libraries.
 * Create a main class and name it whatever you'd like. This will be your mod's starting point. Give it the annotation `@ModMarker`, which takes two elements:
-	* `name` - The full name of the mod.
-	* `version` - The version number of the mod. *(optional)*
+	* `name` &ndash; The full name of the mod.
+	* `version` &ndash; The version number of the mod. *(optional)*
 * Also, give your main class these four methods:
-	* `public static void main(TerminalGL)` - Invoked just before each frame is drawn.
-	* `public static void init(TerminalGL)` - Invoked during the program's start-up. *(optional)*
-	* `public static Object registerMessage(TerminalGL)` - Invoked before `main`. Use this to communicate with other mods between each frame. *(optional)*
-	* `public static void quit(TerminalGL)` - Invoked when the program is about to terminate. *(optional)*
+	* `public static void main(TerminalGL)` &ndash; Invoked just before each frame is drawn.
+	* `public static void init(TerminalGL)` &ndash; Invoked during the program's start-up. *(optional)*
+	* `public static Object registerMessage(TerminalGL)` &ndash; Invoked before `main`. Use this to communicate with other mods between each frame. *(optional)*
+	* `public static void quit(TerminalGL)` &ndash; Invoked when the program is about to terminate. *(optional)*
 * Package your class files (with packages, i.e. folder structure) in a jar and place it as mentioned earlier, or just change your mod directory in the setting file to their containing folder, for easier development.
