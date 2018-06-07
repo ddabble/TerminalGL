@@ -2,7 +2,7 @@
 An experiment with making a graphics library from scratch using characters in a terminal window as pixels.
 
 ### Usage
-* Download **TerminalGL.jar** from this repository's root directory and place it somewhere warm and dry.
+* Download **TerminalGL.jar** from the [releases page](https://github.com/ddabble/TerminalGL/releases) and place it somewhere warm and dry.
 * Put all your mods in a folder named `mods` located in the same directory as the above-mentioned jar file.
 	* If you want to put them elsewhere, create a text file named `settings.txt` in the same directory as the jar file, and write a line starting with `mod-directory:` followed by the full path to the desired mod folder.
 * Run the program from a command prompt by navigating to the directory of the jar file and using the command `java -jar TerminalGL.jar`.
